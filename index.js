@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import dotenv from "dotenv"; // Fixed typo: 'dototenv' to 'dotenv'
+import dotenv from "dotenv"; // Fixed typo
 import route from "./routes/userRoute.js";
 
 const app = express();
@@ -16,10 +16,7 @@ const MONGOURL = process.env.MONGO_URL;
 
 // MongoDB Connection
 mongoose
-  .connect(MONGOURL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGOURL) // No deprecated options needed
   .then(() => {
     console.log("Database connected successfully.");
     // Start the server only after a successful database connection
@@ -36,10 +33,13 @@ app.use("/api/user", route);
 
 // Health Check Endpoint (Optional, but helpful for debugging)
 app.get("/health", (req, res) => {
-  if (mongoose.connection.readyState === 1) {
-    res.status(200).send("MongoDB is connected!");
-  } else {
-    res.status(500).send("MongoDB is not connected!");
-  }
+  const dbState = mongoose.connection.readyState;
+  const status =
+    dbState === 1
+      ? { status: "connected", message: "MongoDB is connected!" }
+      : { status: "disconnected", message: "MongoDB is not connected!" };
+
+  res.status(dbState === 1 ? 200 : 500).send(status);
 });
+
 
