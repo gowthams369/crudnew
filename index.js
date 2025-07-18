@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import dotenv from "dotenv"; // Fixed typo
 import route from "./routes/userRoute.js";
+import cors from 'cors';
+
 
 const app = express();
 
@@ -28,6 +30,10 @@ mongoose
     console.error("Database connection error:", error.message);
   });
 
+//CORS
+app.use(cors()); // Enables CORS for all origins
+
+  
 // Routes
 app.use("/api/user", route);
 
